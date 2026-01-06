@@ -1,3 +1,10 @@
 <Solution>
+  <Folder Name="/Internal/" />
+  <Folder Name="/Internal/Code Analysis/">
+    <File Path="Internal/Code Analysis/qaction-debug.ruleset" />
+    <File Path="Internal/Code Analysis/qaction-release.ruleset" />
+    <File Path="Internal/Code Analysis/stylecop.json" />
+  </Folder>
+  <Project Path="NodeRecovery - Global State Change.Tests/NodeRecovery - Global State Change.Tests.csproj" />
   <Project Path="NodeRecovery - Global State Change/NodeRecovery - Global State Change.csproj" />
 </Solution>
