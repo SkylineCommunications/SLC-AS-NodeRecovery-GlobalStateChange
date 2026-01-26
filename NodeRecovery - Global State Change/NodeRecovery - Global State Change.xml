@@ -3,7 +3,7 @@
 	<Name>NodeRecovery - Global State Change</Name>
 	<Description></Description>
 	<Type>Automation</Type>
-	<Author>RobbeDG</Author>
+	<Author>SkylineCommunications</Author>
 	<CheckSets>FALSE</CheckSets>
 	<Folder>NodeRecovery</Folder>
 	<Interactivity>Auto</Interactivity>

@@ -8,7 +8,7 @@ namespace NodeRecoveryGlobalStateChange
 	public class SwarmingObject
 	{
 		/// <summary>
-		/// Gets or sets the unique key for object in DMS.
+		/// Gets or sets the unique key for the object in DMS.
 		/// </summary>
 		public DMAObjectRef Id { get; set; }
 

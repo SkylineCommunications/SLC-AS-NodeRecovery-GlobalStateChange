@@ -25,14 +25,23 @@
 				return null;
 
 			var id = new ElementID(infoEvent.DataMinerID, infoEvent.ElementID);
-			context.ChildCountByParent.TryGetValue(id, out int childCount);
+			var weight = 1;
+
+			// For DVE parent elements, we cannot swarm the children on their own.
+			// They swarm together with their parent so we increase the weight of the parent element by its child count.
+			// Child count will default to 0 if there are no children.
+			if (context.ChildCountByParent.TryGetValue(id, out int childCount))
+			{
+				weight += childCount;
+			}
+
 			return new SwarmingObject
 			{
 				Id = id,
 				Type = SwarmingObjectType.Element,
 				HostingAgentId = infoEvent.HostingAgentID,
 				IsSwarmable = infoEvent.IsSwarmable,
-				Weight = 1 + childCount,
+				Weight = weight,
 			};
 		}
 	}

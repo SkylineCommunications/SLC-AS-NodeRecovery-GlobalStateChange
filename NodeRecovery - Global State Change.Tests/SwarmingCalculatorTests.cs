@@ -15,8 +15,8 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
-				{ 2, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Outage } },
 			};
 
 			var allObjects = new List<SwarmingObject>
@@ -37,8 +37,8 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
-				{ 2, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Healthy } },
+				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 			};
 
 			var allObjects = new List<SwarmingObject>
@@ -59,8 +59,8 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
-				{ 2, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 			};
 
 			var allObjects = new List<SwarmingObject>
@@ -81,9 +81,9 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
 				{ 2, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = true } }, // In maintenance
-				{ 3, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
+				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
 
 			var allObjects = new List<SwarmingObject>
@@ -105,8 +105,8 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
-				{ 2, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 			};
 
 			var allObjects = new List<SwarmingObject>
@@ -129,9 +129,9 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
-				{ 2, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
-				{ 3, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
+				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
 
 			var allObjects = new List<SwarmingObject>();
@@ -161,9 +161,9 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
-				{ 2, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
-				{ 3, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
+				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
 
 			// 4 objects to move, should be distributed 2-2 between nodes 2 and 3
@@ -194,9 +194,9 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
-				{ 2, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
-				{ 3, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
+				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
 
 			// First object has weight 10 (e.g., parent with 9 DVE children)
@@ -244,9 +244,9 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
-				{ 2, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
-				{ 3, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
+				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
 
 			// One large element with weight 50 (e.g., parent with 49 DVE children)
@@ -280,8 +280,8 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
-				{ 2, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 			};
 
 			var allObjects = new List<SwarmingObject>
@@ -312,9 +312,9 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Arrange
 			var clusterState = new Dictionary<int, NodeStateInfo>
 			{
-				{ 1, new NodeStateInfo { State = NodeState.Outage, InMaintenance = false } },
-				{ 2, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
-				{ 3, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = false } },
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
+				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
 
 			var allObjects = new List<SwarmingObject>
@@ -351,7 +351,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 		}
 
 		private static SwarmingObject CreateElement(
-			int dataMinerId,
+			int dataminerId,
 			int elementId,
 			int hostingAgentId,
 			bool isSwarmable = true,
@@ -359,7 +359,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 		{
 			return new SwarmingObject
 			{
-				Id = new ElementID(dataMinerId, elementId),
+				Id = new ElementID(dataminerId, elementId),
 				Type = SwarmingObjectType.Element,
 				HostingAgentId = hostingAgentId,
 				IsSwarmable = isSwarmable,
@@ -368,7 +368,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 		}
 
 		private static SwarmingObject CreateService(
-			int dataMinerId,
+			int dataminerId,
 			int elementId,
 			int hostingAgentId,
 			bool isSwarmable = true,
@@ -376,7 +376,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 		{
 			return new SwarmingObject
 			{
-				Id = new ServiceID(dataMinerId, elementId),
+				Id = new ServiceID(dataminerId, elementId),
 				Type = SwarmingObjectType.Service,
 				HostingAgentId = hostingAgentId,
 				IsSwarmable = isSwarmable,
@@ -385,7 +385,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 		}
 
 		private static SwarmingObject CreateRedundancyGroup(
-			int dataMinerId,
+			int dataminerId,
 			int elementId,
 			int hostingAgentId,
 			bool isSwarmable = true,
@@ -393,7 +393,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 		{
 			return new SwarmingObject
 			{
-				Id = new RedundancyGroupID(dataMinerId, elementId),
+				Id = new RedundancyGroupID(dataminerId, elementId),
 				Type = SwarmingObjectType.RedundancyGroup,
 				HostingAgentId = hostingAgentId,
 				IsSwarmable = isSwarmable,

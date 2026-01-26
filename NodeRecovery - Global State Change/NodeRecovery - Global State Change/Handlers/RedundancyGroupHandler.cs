@@ -21,7 +21,7 @@
 				Id = new RedundancyGroupID(infoEvent.DataMinerID, infoEvent.ElementID),
 				Type = SwarmingObjectType.RedundancyGroup,
 				HostingAgentId = infoEvent.HostingAgentID,
-				IsSwarmable = false,
+				IsSwarmable = false, // not swarmable yet
 				Weight = 1,
 			};
 		}

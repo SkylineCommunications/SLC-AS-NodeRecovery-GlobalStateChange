@@ -7,7 +7,7 @@ namespace NodeRecoveryGlobalStateChange
 	using Skyline.DataMiner.Net.Swarming;
 
 	/// <summary>
-	/// Calculates optimal swarming decisions during node recovery.
+	/// Calculates optimal swarming decisions for NodeRecovery.
 	/// </summary>
 	public static class SwarmingCalculator
 	{
@@ -16,7 +16,7 @@ namespace NodeRecoveryGlobalStateChange
 		/// </summary>
 		/// <param name="clusterState">The current cluster state mapping node IDs to their state info.</param>
 		/// <param name="allObjects">All swarming objects in the cluster.</param>
-		/// <returns>Dictionary of Swarming request arrays, 1 array per target agent id.</returns>
+		/// <returns>Dictionary of Swarming request arrays, 1 array per target agent id. Each array contains a message per SwarmingObjectType.</returns>
 		public static Dictionary<int, SwarmingRequestMessage[]> CalculateSwarmingRequests(
 			Dictionary<int, NodeStateInfo> clusterState,
 			List<SwarmingObject> allObjects)
@@ -26,6 +26,8 @@ namespace NodeRecoveryGlobalStateChange
 			if (allObjects == null)
 				throw new ArgumentNullException(nameof(allObjects));
 
+			// Gather all nodes that are in Outage (to swarm from) and Healthy (to swarm to)
+			// Exclude nodes in Maintenance mode as they are not be touched in any capacity
 			var nodesByState = clusterState
 				.Where(kvp => !kvp.Value.InMaintenance)
 				.ToLookup(kvp => kvp.Value.State, kvp => kvp.Key);
@@ -46,6 +48,10 @@ namespace NodeRecoveryGlobalStateChange
 			var nodeLoadTracker = new NodeLoadTracker(healthyNodes, allObjects);
 			var assignments = new Dictionary<int, List<SwarmingObject>>(healthyNodes.Count);
 
+			// To maximize balancing effectiveness, assign heaviest objects first
+			// This avoids a scenario where many small objects are assigned first,
+			// leading to suboptimal distribution of heavier objects later on.
+			// Resulting in a final distribution that is less balanced.
 			foreach (var obj in objectsToMove.OrderByDescending(o => o.Weight))
 			{
 				int targetNode = nodeLoadTracker.GetLeastLoadedNode();
@@ -60,15 +66,15 @@ namespace NodeRecoveryGlobalStateChange
 			}
 
 			return assignments.ToDictionary(
-				kvp => kvp.Key,
+				kvp => kvp.Key, // target DMA ID
 				kvp =>
 				{
 					var targetDmaId = kvp.Key;
-					var objs = kvp.Value;
+					var objectsToSwarm = kvp.Value;
 
-					return objs
-						.GroupBy(obj => obj.Type)
-						.OrderBy(grp => grp.Key) // !! Use the order defined in SwarmingObjectType
+					return objectsToSwarm
+						.GroupBy(obj => obj.Type) // Swarm requests need to be grouped by object type
+						.OrderBy(grp => grp.Key) // Swarm more important objects first (!! Uses the order defined in SwarmingObjectType)
 						.Select(grp => new SwarmingRequestMessage
 						{
 							TargetDmaId = targetDmaId,

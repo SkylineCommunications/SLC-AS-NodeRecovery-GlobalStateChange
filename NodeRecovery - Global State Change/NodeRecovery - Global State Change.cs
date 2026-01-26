@@ -57,6 +57,8 @@ namespace NodeRecoveryGlobalStateChange
 
 		private LocalStateChangeOutput RunSafe(IEngine engine, LocalStateChangeInput input)
 		{
+			engine.Timeout = TimeSpan.FromMinutes(30);
+
 			var connection = engine.GetUserConnection();
 
 			// Dynamically fetch discovery messages from handlers
@@ -75,37 +77,50 @@ namespace NodeRecoveryGlobalStateChange
 
 			if (swarmingRequests.Count == 0)
 			{
-				engine.GenerateInformation("Node Recovery: Nothing need to be swarmed.");
+				engine.GenerateInformation("NodeRecovery: Nothing needs to be swarmed.");
 				return default;
 			}
 
 			int totalObjects = swarmingRequests.Values.Sum(reqs => reqs.Sum(req => req.DmaObjectRefs.Length));
-			engine.GenerateInformation($"Node Recovery: Swarming {totalObjects} object(s) to {swarmingRequests.Count} agents.");
+			engine.GenerateInformation($"NodeRecovery: Swarming {totalObjects} object(s) to {swarmingRequests.Count} agents.");
 
 			// Create a nested ExecuteArrayMessage to run in parallel per agent
 			// However, per agent we then run sequentially per object type to avoid overloading the agent
 			// and prioritizing the more important object types first (services are not worth much without elements).
 			var sequentialWrappersPerAgent = swarmingRequests.Values.Select(arr => new ExecuteArrayMessage(arr)).ToArray();
-			var parellelWrapper = new ExecuteArrayMessage(sequentialWrappersPerAgent, ExecuteArrayOptions.Parallel);
+			var parallelWrapper = new ExecuteArrayMessage(sequentialWrappersPerAgent, ExecuteArrayOptions.Parallel);
 
-			var response = connection.HandleSingleResponseMessage(parellelWrapper) as ExecuteArrayResponse;
+			var parallelWrapperResponse = connection.HandleSingleResponseMessage(parallelWrapper) as ExecuteArrayResponse;
 
-			if (response == null)
+			if (parallelWrapperResponse == null)
+			{
+				engine.ExitFail("NodeRecovery: Swarming execution failed, no response for swarming requests");
 				return default;
+			}
 
-			var failures = response
-				.Responses.SelectMany(r => r.Responses)
-				.OfType<ExecuteArrayResponse>()
-				.SelectMany(r => r.Responses.SelectMany(r2 => r2.Responses))
-				.OfType<SwarmingResponseMessage>()
+			// Unwrap the parallel wrapper
+			var sequentialWrapperResponses = parallelWrapperResponse
+				.Responses
+				.SelectMany(executeResponse => executeResponse.Responses)
+				.OfType<ExecuteArrayResponse>();
+
+			// Unwrap the sequential wrappers and flatten the list of list to get single collection
+			var swarmingResponses = sequentialWrapperResponses
+				.SelectMany(executeResponse => executeResponse
+					.Responses
+					.SelectMany(sequentialWrapperResponse => sequentialWrapperResponse.Responses))
+				.OfType<SwarmingResponseMessage>();
+
+			// For each SwarmingResponseMessage, collect the failed results
+			var failures = swarmingResponses
 				.SelectMany(resp => resp.SwarmingResults)
 				.Where(res => !res.Success)
 				.ToList();
 
 			if (failures.Count == 0)
-				engine.GenerateInformation("Node Recovery: All swarming requests succeeded.");
+				engine.GenerateInformation("NodeRecovery: All swarming requests succeeded.");
 			else
-				engine.GenerateInformation($"Node Recovery: {failures.Count} object(s) failed to swarm.");
+				engine.GenerateInformation($"NodeRecovery: {failures.Count} object(s) failed to swarm.");
 
 			return default;
 		}

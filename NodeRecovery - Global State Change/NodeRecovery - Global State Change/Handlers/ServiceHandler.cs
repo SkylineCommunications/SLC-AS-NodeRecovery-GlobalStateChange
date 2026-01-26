@@ -19,9 +19,9 @@
 			return new SwarmingObject
 			{
 				Id = new ServiceID(infoEvent.DataMinerID, infoEvent.ElementID),
-				Type = SwarmingObjectType.RedundancyGroup,
+				Type = SwarmingObjectType.Service,
 				HostingAgentId = infoEvent.HostingAgentID,
-				IsSwarmable = false,
+				IsSwarmable = false, // not swarmable yet
 				Weight = 1,
 			};
 		}
