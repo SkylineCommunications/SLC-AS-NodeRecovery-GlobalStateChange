@@ -20,8 +20,8 @@ namespace NodeRecoveryGlobalStateChange
 		/// <param name="engine">Link with SLAutomation process.</param>
 		/// <param name="input">Input from NodeRecovery.</param>
 		/// <returns>Output returned to NodeRecovery.</returns>
-		[AutomationEntryPoint(AutomationEntryPointType.Types.OnNodeRecoveryLocalStateChange)]
-		public LocalStateChangeOutput OnNodeRecoveryLocalStateChange(IEngine engine, LocalStateChangeInput input)
+		[AutomationEntryPoint(AutomationEntryPointType.Types.OnNodeRecoveryGlobalStateChange)]
+		public GlobalStateChangeOutput OnNodeRecoveryGlobalStateChange(IEngine engine, GlobalStateChangeInput input)
 		{
 			try
 			{
@@ -55,7 +55,7 @@ namespace NodeRecoveryGlobalStateChange
 			}
 		}
 
-		private LocalStateChangeOutput RunSafe(IEngine engine, LocalStateChangeInput input)
+		private GlobalStateChangeOutput RunSafe(IEngine engine, GlobalStateChangeInput input)
 		{
 			engine.Timeout = TimeSpan.FromMinutes(30);
 
