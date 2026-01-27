@@ -66,7 +66,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			var allObjects = new List<SwarmingObject>
 			{
 				CreateElement(753, 100, hostingAgentId: 2, isSwarmable: false),
-				CreateElement(753, 101, hostingAgentId: 2, isSwarmable: false),
+				CreateElement(753, 101, hostingAgentId: 2),
 			};
 
 			// Act
@@ -251,6 +251,37 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			{
 				Assert.That(requests.Sum(r => r.DmaObjectRefs.Length), Is.EqualTo(2));
 			}
+		}
+
+		[Test]
+		public void LoadBalancing_DistributesEvenly_MultiOutage()
+		{
+			// Arrange
+			var clusterState = new Dictionary<int, NodeStateInfo>
+			{
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Outage } },
+				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
+			};
+
+			// 4 objects to move, should all go to node 3
+			var allObjects = new List<SwarmingObject>
+			{
+				CreateElement(753, 100, hostingAgentId: 1),
+				CreateElement(753, 101, hostingAgentId: 1),
+				CreateElement(753, 102, hostingAgentId: 1),
+				CreateElement(753, 103, hostingAgentId: 2),
+				CreateElement(753, 104, hostingAgentId: 3),
+			};
+
+			// Act
+			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+
+			// Assert - should have requests to node 3 only
+			Assert.That(result, Has.Count.EqualTo(1));
+			Assert.That(result.ContainsKey(3), Is.True);
+			var requests = result[3];
+			Assert.That(requests.Sum(r => r.DmaObjectRefs.Length), Is.EqualTo(4));
 		}
 
 		[Test]
