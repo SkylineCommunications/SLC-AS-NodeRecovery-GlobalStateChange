@@ -10,12 +10,12 @@ namespace NodeRecoveryGlobalStateChange
 	using Skyline.DataMiner.Net.Swarming;
 
 	/// <summary>
-	/// Represents a DataMiner Automation script.
+	/// Script that is triggered by NodeRecovery on global state changes.
 	/// </summary>
 	public class Script
 	{
 		/// <summary>
-		/// The script entry point.
+		/// The script entry point for NodeRecovery.
 		/// </summary>
 		/// <param name="engine">Link with SLAutomation process.</param>
 		/// <param name="input">Input from NodeRecovery.</param>
@@ -71,7 +71,7 @@ namespace NodeRecoveryGlobalStateChange
 
 			var infoEvents = connection.HandleMessages(discoveryMessages);
 
-			var swarmingObjects = ConvertInfoEvents(infoEvents);
+			var swarmingObjects = SwarmingContext.ConvertInfoEvents(infoEvents);
 
 			var swarmingRequests = SwarmingCalculator.CalculateSwarmingRequests(input.ClusterState, swarmingObjects);
 
@@ -123,35 +123,6 @@ namespace NodeRecoveryGlobalStateChange
 				engine.GenerateInformation($"NodeRecovery: {failures.Count} object(s) failed to swarm.");
 
 			return default;
-		}
-
-		private List<SwarmingObject> ConvertInfoEvents(DMSMessage[] msgs)
-		{
-			var output = new List<SwarmingObject>(msgs.Length);
-
-			var context = new SwarmingContext
-			{
-				ChildCountByParent = msgs.OfType<LiteElementInfoEvent>()
-					.Where(e => e.IsDynamicElement)
-					.GroupBy(e => new ElementID(e.DveParentDmaId, e.DveParentElementId))
-					.ToDictionary(g => g.Key, g => g.Count()),
-			};
-
-			foreach (var msg in msgs)
-			{
-				foreach (var handler in SwarmingContext.Handlers.Values)
-				{
-					if (handler.CanHandle(msg))
-					{
-						var obj = handler.Convert(msg, context);
-						if (obj != null)
-							output.Add(obj);
-						break;
-					}
-				}
-			}
-
-			return output;
 		}
 	}
 }

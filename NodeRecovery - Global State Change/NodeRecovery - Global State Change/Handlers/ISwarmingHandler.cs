@@ -15,7 +15,7 @@
 		DMSMessage DiscoveryMessage { get; }
 
 		/// <summary>
-		/// Determines whether the specified message can be handled by the current handler.
+		/// Determines whether the specified message (passed as generic DMSMessage) can be handled by the current handler.
 		/// As the information is requested in bulk. The responses cannot be linked back to an orignal handler.
 		/// This filters out the desired messages.
 		/// </summary>
@@ -24,7 +24,7 @@
 		bool CanHandle(DMSMessage message);
 
 		/// <summary>
-		/// Converts the info event message of this type to a generic SwarmingObject used by the load balancer.
+		/// Converts the info event message of this type to a generic <see cref="SwarmingObject"/> used by the load balancer.
 		/// </summary>
 		/// <param name="message">the message to convert.</param>
 		/// <param name="context">the general context of the action.</param>
