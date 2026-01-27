@@ -120,7 +120,8 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			// Assert
 			Assert.That(result, Has.Count.EqualTo(1));
 			Assert.That(result.ContainsKey(2), Is.True);
-			Assert.That(result[2][0].DmaObjectRefs, Has.Length.EqualTo(1));
+			var swarmingRequests = result[2];
+			Assert.That(swarmingRequests[0].DmaObjectRefs, Has.Length.EqualTo(1));
 		}
 
 		[Test]
@@ -272,6 +273,10 @@ namespace NodeRecoveryGlobalStateChange.Tests
 
 			// One node should have the heavy item (1) and the other all small items (5)
 			Assert.That(new[] { load1, load2 }, Is.EquivalentTo(new[] { 1, 5 }));
+
+			// Also assert the single one is the large weight item
+			var heavyNodeRequests = result.Values.First(r => r.Sum(req => req.DmaObjectRefs.Length) == 1);
+			Assert.That(heavyNodeRequests.SelectMany(r => r.DmaObjectRefs).First().ToString(), Does.Contain("106"));
 		}
 
 		[Test]
