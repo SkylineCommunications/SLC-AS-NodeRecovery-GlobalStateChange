@@ -16,7 +16,7 @@
 
 		/// <summary>
 		/// Determines whether the specified message (passed as generic DMSMessage) can be handled by the current handler.
-		/// As the information is requested in bulk. The responses cannot be linked back to an orignal handler.
+		/// As the information is requested in bulk. The responses cannot be linked back to an original handler.
 		/// This filters out the desired messages.
 		/// </summary>
 		/// <param name="message">The message to evaluate for handling. Cannot be null.</param>

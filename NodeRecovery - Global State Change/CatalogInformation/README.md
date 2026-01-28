@@ -17,11 +17,11 @@ Swarming operations happen in parallel per agent, where the swarming per agent h
 - Monitors global state changes of agents in a cluster
 - Automatically triggers swarming of objects from nodes in outage to healthy nodes
 - Implements basic load balancing during the swarming process
-- Ignores nodes that are in maintenance mode or in uknown state
+- Ignores nodes that are in maintenance mode or in unknown state
 - Enhances system reliability and availability
 
 ## Prerequisites
 
 - DataMiner version 10.6.3 or higher
 - Swarming must be enabled
-- DataMiner NodeRecovery DxM module installed on every agent in the cluster
+- DataMiner NodeRecovery DxM module installed

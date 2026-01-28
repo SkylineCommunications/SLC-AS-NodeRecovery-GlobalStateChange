@@ -31,7 +31,7 @@
 		/// <summary>
 		/// Helper method that takes in the bulk of SLNet's DMSMessages and converts them to <see cref="SwarmingObject"/> via the specified handlers.
 		/// </summary>
-		/// <param name="msgs">Bulk messages retruned by SLNet.</param>
+		/// <param name="msgs">Bulk messages returned by SLNet.</param>
 		/// <returns>Collection of converted <see cref="SwarmingObject"/>.</returns>
 		internal static List<SwarmingObject> ConvertInfoEvents(DMSMessage[] msgs)
 		{
