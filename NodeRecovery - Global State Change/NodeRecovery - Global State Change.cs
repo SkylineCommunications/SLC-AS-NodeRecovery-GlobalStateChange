@@ -87,7 +87,7 @@ namespace NodeRecoveryGlobalStateChange
 			// Create a nested ExecuteArrayMessage to run in parallel per agent
 			// However, per agent we then run sequentially per object type to avoid overloading the agent
 			// and prioritizing the more important object types first (services are not worth much without elements).
-			var sequentialWrappersPerAgent = swarmingRequests.Values.Select(arr => new ExecuteArrayMessage(arr)).ToArray();
+			var sequentialWrappersPerAgent = swarmingRequests.Values.Select(arr => new ExecuteArrayMessage(arr)).ToArray<DMSMessage>();
 			var parallelWrapper = new ExecuteArrayMessage(sequentialWrappersPerAgent, ExecuteArrayOptions.Parallel);
 
 			var parallelWrapperResponse = connection.HandleSingleResponseMessage(parallelWrapper) as ExecuteArrayResponse;
