@@ -1,10 +1,8 @@
 namespace NodeRecoveryGlobalStateChange
 {
 	using System;
-	using System.Collections.Generic;
 	using System.Linq;
 	using Skyline.DataMiner.Automation;
-	using Skyline.DataMiner.Net;
 	using Skyline.DataMiner.Net.Messages;
 	using Skyline.DataMiner.Net.NodeRecovery;
 	using Skyline.DataMiner.Net.Swarming;
