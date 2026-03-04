@@ -2,7 +2,7 @@
 
 ## About
 
-Automation script used by the NodeRecovery DxM module that triggers on global state changes in a cluster environment.
+Deploys an automation script ("NodeRecovery - Global State Change") used by the NodeRecovery DxM module that triggers on global state changes in a cluster environment.
 
 This script ensures objects hosted on nodes in outage are swarmed to healthy nodes in the cluster, ensuring high availability and minimizing downtime.
 A rudimentary load balancing strategy is implemented to avoid overloading healthy nodes during the swarming process.

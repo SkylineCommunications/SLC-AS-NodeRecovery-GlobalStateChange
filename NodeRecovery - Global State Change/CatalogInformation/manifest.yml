@@ -33,7 +33,7 @@ id: 3de8405e-7156-4a0a-b8c5-80937de0f4ed
 #   Max length: 100 characters.
 #   Cannot contain newlines.
 #   Cannot contain leading or trailing whitespace characters.
-title: NodeRecovery - Global State Change
+title: Node Recovery - Rebalance across healthy agents
 
 # [Optional]
 # General information about the Catalog item.
