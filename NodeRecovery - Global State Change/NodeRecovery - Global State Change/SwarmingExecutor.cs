@@ -27,7 +27,7 @@
 			{
 				if (attempt > 1)
 				{
-					engine.GenerateInformation($"NodeRecovery: Retry attempt {attempt}/{maxRetries} ({failures.Count} object(s) left) ...");
+					engine.GenerateInformation($"NodeRecovery: Attempt {attempt}/{maxRetries} ({failures.Count} object(s) left) ...");
 					Thread.Sleep(TimeSpan.FromSeconds(5 * attempt));
 				}
 
