@@ -4,6 +4,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 	using System.Linq;
 	using NUnit.Framework;
 	using Skyline.DataMiner.Net;
+	using Skyline.DataMiner.Net.Messages;
 	using Skyline.DataMiner.Net.NodeRecovery;
 
 	[TestFixture]
@@ -167,6 +168,37 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			Assert.That(swarmingRequests, Has.Length.EqualTo(1));
 			Assert.That(swarmingRequests[0].DmaObjectRefs, Has.Length.EqualTo(1)); // Only object from node 1 should be moved
 			Assert.That(swarmingRequests[0].DmaObjectRefs[0].ToString(), Contains.Substring("753/100")); // Element 753/100
+		}
+
+		[Test]
+		public void HealthyButDisconnectedNode_IsIgnored()
+		{
+			// Arrange
+			var clusterState = new Dictionary<int, NodeStateInfo>
+			{
+				{ 1, new NodeStateInfo { State = NodeState.Outage } },
+				{ 2, new NodeStateInfo { State = NodeState.Healthy} },
+				{ 3, new NodeStateInfo { State = NodeState.Healthy} },
+			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(
+				new GlobalStateChangeInput() { ClusterState = clusterState },
+				new[] { new DataMinerInfoEvent(new GetDataMinerInfoResponseMessage() { ID = 3, ConnectionState = DataMinerAgentConnectionState.Disconnected }) });
+
+			var allObjects = new List<SwarmingObject>
+			{
+				CreateElement(753, 100, hostingAgentId: 1),
+				CreateElement(753, 101, hostingAgentId: 1),
+			};
+
+			// Act
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
+
+			// Assert
+			Assert.That(result, Has.Count.EqualTo(1));
+			Assert.That(result.ContainsKey(2), Is.True); // Should only have requests for node 2
+			var swarmingRequests = result[2];
+			Assert.That(swarmingRequests, Has.Length.EqualTo(1));
+			Assert.That(swarmingRequests[0].DmaObjectRefs, Has.Length.EqualTo(2)); // Only object from node 1 should be moved
 		}
 
 		[Test]

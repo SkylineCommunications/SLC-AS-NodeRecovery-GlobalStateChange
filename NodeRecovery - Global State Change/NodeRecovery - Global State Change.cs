@@ -60,19 +60,25 @@ namespace NodeRecoveryGlobalStateChange
 
 			var connection = engine.GetUserConnection();
 
-			// Dynamically fetch discovery messages from handlers
+			// TODO first check outage to avoid unnecessary data transfer on all healthy
+
+			// Fetch DMS agent states
+			// Also fetch discovery messages from handlers for swarming object types
 			var discoveryMessages = SwarmingContext
 				.Handlers
 				.Values
 				.Select(h => h.DiscoveryMessage)
 				.Where(m => m != null)
-				.ToArray();
+				.Concat(new[] { new GetInfoMessage(InfoType.DataMinerInfo) })
+				.ToList();
 
-			var infoEvents = connection.HandleMessages(discoveryMessages);
+			var infoEvents = connection.HandleMessages(discoveryMessages.ToArray());
+
+			var dataMinerInfos = infoEvents.OfType<GetDataMinerInfoResponseMessage>().ToArray();
 
 			var swarmingObjects = SwarmingContext.ConvertInfoEvents(infoEvents);
 
-			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(input);
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(input, dataMinerInfos, engine);
 
 			var swarmingRequests = SwarmingCalculator.CalculateSwarmingRequests(
 				healhtyTargets,
