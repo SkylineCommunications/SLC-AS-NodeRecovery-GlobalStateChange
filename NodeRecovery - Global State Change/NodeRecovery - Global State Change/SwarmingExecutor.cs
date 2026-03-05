@@ -124,19 +124,35 @@
 
 		private static Dictionary<int, SwarmingRequestMessage[]> RedistributeFailedObjects(
 			List<SwarmingResult> failures,
-			List<int> healhtyTargets)
+			List<int> healthyTargets)
 		{
 			if (failures.Count == 0)
 				return new Dictionary<int, SwarmingRequestMessage[]>();
 
 			// Simple round-robin distribution to any healthy node
+			// but avoid assigning an object to the same agent it just failed on
 			var redistributed = new Dictionary<int, List<DMAObjectRef>>();
 			int nodeIndex = 0;
 
 			foreach (var failure in failures)
 			{
-				int targetNode = healhtyTargets[nodeIndex % healhtyTargets.Count];
-				nodeIndex++;
+				// Find a target that is NOT the one it just failed on
+				int targetNode = -1;
+				for (int i = 0; i < healthyTargets.Count; i++)
+				{
+					int candidate = healthyTargets[(nodeIndex + i) % healthyTargets.Count];
+					if (candidate != failure.TargetDmaId)
+					{
+						targetNode = candidate;
+						nodeIndex = nodeIndex + 1 + i;
+						break;
+					}
+				}
+
+				// Fallback: if all healthy targets were the failed target (edge case with 1 target),
+				// we have no choice but to retry on the same agent
+				if (targetNode == -1)
+					targetNode = failure.TargetDmaId;
 
 				if (!redistributed.TryGetValue(targetNode, out var list))
 				{
