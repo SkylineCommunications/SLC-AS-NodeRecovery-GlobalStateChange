@@ -1,4 +1,4 @@
-# NodeRecovery - Global State Change
+# Node Recovery - Rebalance across healthy agents
 
 ## About
 
