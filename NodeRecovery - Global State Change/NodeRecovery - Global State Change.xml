@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <DMSScript options="272" xmlns="http://www.skyline.be/automation">
 	<Name>NodeRecovery - Global State Change</Name>
-	<Description></Description>
+	<Description>Used by the NodeRecovery DxM module that triggers on global state changes in a cluster environment. See http://aka.dataminer.services/node-recovery for more info.</Description>
 	<Type>Automation</Type>
 	<Author>SkylineCommunications</Author>
 	<CheckSets>FALSE</CheckSets>
