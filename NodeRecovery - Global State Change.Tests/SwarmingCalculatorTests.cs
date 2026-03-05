@@ -18,6 +18,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 1, new NodeStateInfo { State = NodeState.Outage } },
 				{ 2, new NodeStateInfo { State = NodeState.Outage } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			var allObjects = new List<SwarmingObject>
 			{
@@ -25,7 +26,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Is.Empty);
@@ -40,6 +41,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 1, new NodeStateInfo { State = NodeState.Healthy } },
 				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			var allObjects = new List<SwarmingObject>
 			{
@@ -47,7 +49,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Is.Empty);
@@ -62,6 +64,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 1, new NodeStateInfo { State = NodeState.Outage } },
 				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			var allObjects = new List<SwarmingObject>
 			{
@@ -70,7 +73,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Is.Empty);
@@ -85,6 +88,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 1, new NodeStateInfo { State = NodeState.Outage } },
 				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			var allObjects = new List<SwarmingObject>
 			{
@@ -93,7 +97,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Is.Empty);
@@ -110,6 +114,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 3, new NodeStateInfo { State = NodeState.Healthy, InMaintenance = true } }, // In maintenance
 				{ 4, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			var allObjects = new List<SwarmingObject>
 			{
@@ -120,7 +125,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Has.Count.EqualTo(1));
@@ -142,6 +147,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 3, new NodeStateInfo { State = NodeState.Unknown} },
 				{ 4, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			var allObjects = new List<SwarmingObject>
 			{
@@ -152,7 +158,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Has.Count.EqualTo(1));
@@ -172,6 +178,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 1, new NodeStateInfo { State = NodeState.Outage } },
 				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			var allObjects = new List<SwarmingObject>
 			{
@@ -179,7 +186,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Has.Count.EqualTo(1));
@@ -198,6 +205,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			var allObjects = new List<SwarmingObject>();
 
@@ -212,7 +220,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			allObjects.Add(CreateElement(753, 101, hostingAgentId: 1));
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert - both objects should go to node 3 (least loaded)
 			Assert.That(result, Has.Count.EqualTo(1));
@@ -230,6 +238,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			// 4 objects to move, should be distributed 2-2 between nodes 2 and 3
 			var allObjects = new List<SwarmingObject>
@@ -241,7 +250,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert - should have requests to both nodes
 			Assert.That(result, Has.Count.EqualTo(2));
@@ -263,6 +272,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 2, new NodeStateInfo { State = NodeState.Outage } },
 				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			// 4 objects to move, should all go to node 3
 			var allObjects = new List<SwarmingObject>
@@ -275,7 +285,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert - should have requests to node 3 only
 			Assert.That(result, Has.Count.EqualTo(1));
@@ -294,6 +304,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			// First object has weight 10 (e.g., parent with 9 DVE children)
 			// Second object has weight 1
@@ -306,7 +317,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Has.Count.EqualTo(2));
@@ -319,18 +330,18 @@ namespace NodeRecoveryGlobalStateChange.Tests
 		}
 
 		[Test]
-		public void NullClusterState_ThrowsArgumentNullException()
+		public void ThrowsArgumentNullException()
 		{
 			Assert.That(
-				() => SwarmingCalculator.CalculateSwarmingRequests(null, new List<SwarmingObject>()),
+				() => SwarmingCalculator.CalculateSwarmingRequests(new HashSet<int>(), new HashSet<int>(), null),
 				Throws.ArgumentNullException);
-		}
 
-		[Test]
-		public void NullAllObjects_ThrowsArgumentNullException()
-		{
 			Assert.That(
-				() => SwarmingCalculator.CalculateSwarmingRequests(new Dictionary<int, NodeStateInfo>(), null),
+				() => SwarmingCalculator.CalculateSwarmingRequests(new HashSet<int>(), null, new List<SwarmingObject>()),
+				Throws.ArgumentNullException);
+
+			Assert.That(
+				() => SwarmingCalculator.CalculateSwarmingRequests(null, new HashSet<int>(), new List<SwarmingObject>()),
 				Throws.ArgumentNullException);
 		}
 
@@ -344,6 +355,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			// One large element with weight 50 (e.g., parent with 49 DVE children)
 			// Five small elements with weight 1 each
@@ -358,7 +370,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Has.Count.EqualTo(2));
@@ -383,6 +395,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 1, new NodeStateInfo { State = NodeState.Outage } },
 				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			var allObjects = new List<SwarmingObject>
 			{
@@ -392,7 +405,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Has.Count.EqualTo(1));
@@ -416,6 +429,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 				{ 2, new NodeStateInfo { State = NodeState.Healthy } },
 				{ 3, new NodeStateInfo { State = NodeState.Healthy } },
 			};
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(new GlobalStateChangeInput() { ClusterState = clusterState });
 
 			var allObjects = new List<SwarmingObject>
 			{
@@ -436,7 +450,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			};
 
 			// Act
-			var result = SwarmingCalculator.CalculateSwarmingRequests(clusterState, allObjects);
+			var result = SwarmingCalculator.CalculateSwarmingRequests(healhtyTargets, outageSources, allObjects);
 
 			// Assert
 			Assert.That(result, Is.Not.Empty);

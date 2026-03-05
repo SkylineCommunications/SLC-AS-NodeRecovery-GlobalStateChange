@@ -14,39 +14,34 @@ namespace NodeRecoveryGlobalStateChange
 		/// <summary>
 		/// Calculates the swarming requests needed to move objects from unhealthy nodes to healthy nodes.
 		/// </summary>
-		/// <param name="clusterState">The current cluster state mapping node IDs to their state info.</param>
+		/// <param name="healhtyTargets">DMAID of agents that are valid swarming targets.</param>
+		/// <param name="outageSources">DMAID of agents in node recovery global outage that needs recovery.</param>
 		/// <param name="allObjects">All swarming objects in the cluster.</param>
 		/// <returns>Dictionary of Swarming request arrays, 1 array per target agent id. Each array contains a message per SwarmingObjectType.</returns>
 		public static Dictionary<int, SwarmingRequestMessage[]> CalculateSwarmingRequests(
-			Dictionary<int, NodeStateInfo> clusterState,
+			HashSet<int> healhtyTargets,
+			HashSet<int> outageSources,
 			List<SwarmingObject> allObjects)
 		{
-			if (clusterState == null)
-				throw new ArgumentNullException(nameof(clusterState));
+			if (healhtyTargets == null)
+				throw new ArgumentNullException(nameof(healhtyTargets));
+			if (outageSources == null)
+				throw new ArgumentNullException(nameof(outageSources));
 			if (allObjects == null)
 				throw new ArgumentNullException(nameof(allObjects));
 
-			// Gather all nodes that are in Outage (to swarm from) and Healthy (to swarm to)
-			// Exclude nodes in Maintenance mode as they are not be touched in any capacity
-			var nodesByState = clusterState
-				.Where(kvp => !kvp.Value.InMaintenance)
-				.ToLookup(kvp => kvp.Value.State, kvp => kvp.Key);
-
-			var healthyNodes = new HashSet<int>(nodesByState[NodeState.Healthy]);
-			var outageNodes = new HashSet<int>(nodesByState[NodeState.Outage]);
-
-			if (healthyNodes.Count == 0 || outageNodes.Count == 0)
+			if (healhtyTargets.Count == 0 || outageSources.Count == 0)
 				return new Dictionary<int, SwarmingRequestMessage[]>();
 
 			var objectsToMove = allObjects
-				.Where(o => o.IsSwarmable && outageNodes.Contains(o.HostingAgentId))
+				.Where(o => o.IsSwarmable && outageSources.Contains(o.HostingAgentId))
 				.ToList();
 
 			if (objectsToMove.Count == 0)
 				return new Dictionary<int, SwarmingRequestMessage[]>();
 
-			var nodeLoadTracker = new NodeLoadTracker(healthyNodes, allObjects);
-			var assignments = new Dictionary<int, List<SwarmingObject>>(healthyNodes.Count);
+			var nodeLoadTracker = new NodeLoadTracker(healhtyTargets, allObjects);
+			var assignments = new Dictionary<int, List<SwarmingObject>>(healhtyTargets.Count);
 
 			// To maximize balancing effectiveness, assign heaviest objects first
 			// This avoids a scenario where many small objects are assigned first,

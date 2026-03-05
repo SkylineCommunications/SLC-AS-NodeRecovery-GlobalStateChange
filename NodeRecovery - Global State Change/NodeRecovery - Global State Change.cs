@@ -1,6 +1,7 @@
 namespace NodeRecoveryGlobalStateChange
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Linq;
 	using Skyline.DataMiner.Automation;
 	using Skyline.DataMiner.Net.Messages;
@@ -71,7 +72,12 @@ namespace NodeRecoveryGlobalStateChange
 
 			var swarmingObjects = SwarmingContext.ConvertInfoEvents(infoEvents);
 
-			var swarmingRequests = SwarmingCalculator.CalculateSwarmingRequests(input.ClusterState, swarmingObjects);
+			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(input);
+
+			var swarmingRequests = SwarmingCalculator.CalculateSwarmingRequests(
+				healhtyTargets,
+				outageSources,
+				swarmingObjects);
 
 			if (swarmingRequests.Count == 0)
 			{
