@@ -52,10 +52,19 @@
 					// However the failure might also be due to the object in question
 					// We do a heuristic here where if we see multiple failures for the same target agent,
 					// we consider that agent as unhealthy and exclude it from the retries
-					var failureCountPerAgent = failures.GroupBy(f => f.TargetDmaId).ToDictionary(g => g.Key, g => g.Count());
 					const int failureThreshold = 3;
+					var targetsToExclude = failures
+						.GroupBy(f => f.TargetDmaId)
+						.Where(g => g.Count() >= failureThreshold)
+						.ToDictionary(g => g.Key, g => g.Count());
+
+					foreach (var kvp in targetsToExclude)
+					{
+						engine.Log($"NodeRecovery: Excluding target agent {kvp.Key} from retries due to {kvp.Value} (>={failureThreshold}) failures.");
+					}
+
 					remainingHealthyTargets = remainingHealthyTargets
-						.Where(t => !failureCountPerAgent.TryGetValue(t, out var count) || count < failureThreshold)
+						.Except(targetsToExclude.Keys)
 						.ToList();
 
 					if (remainingHealthyTargets.Count == 0)
