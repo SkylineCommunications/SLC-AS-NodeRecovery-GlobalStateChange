@@ -86,14 +86,9 @@ namespace NodeRecoveryGlobalStateChange
 			}
 
 			int totalObjects = swarmingRequests.Values.Sum(reqs => reqs.Sum(req => req.DmaObjectRefs.Length));
-			engine.GenerateInformation($"NodeRecovery: Swarming {totalObjects} object(s) to {swarmingRequests.Count} agents.");
+			engine.GenerateInformation($"NodeRecovery: Swarming {totalObjects} object(s)");
 
-			var failures = SwarmingExecutor.Execute(connection, swarmingRequests);
-
-			if (failures.Count == 0)
-				engine.GenerateInformation("NodeRecovery: All swarming requests succeeded.");
-			else
-				engine.GenerateInformation($"NodeRecovery: {failures.Count} object(s) failed to swarm.");
+			SwarmingExecutor.ExecuteWithRetry(engine, connection, healhtyTargets, swarmingRequests);
 
 			return default;
 		}

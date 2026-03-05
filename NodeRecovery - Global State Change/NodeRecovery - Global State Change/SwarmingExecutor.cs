@@ -1,7 +1,10 @@
 ﻿namespace NodeRecoveryGlobalStateChange
 {
+	using System;
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Threading;
+	using Skyline.DataMiner.Automation;
 	using Skyline.DataMiner.Net;
 	using Skyline.DataMiner.Net.Exceptions;
 	using Skyline.DataMiner.Net.Messages;
@@ -9,8 +12,72 @@
 
 	internal static class SwarmingExecutor
 	{
-		internal static List<SwarmingResult> Execute(IConnection connection, Dictionary<int, SwarmingRequestMessage[]> swarmingRequests)
+		internal static void ExecuteWithRetry(
+			IEngine engine,
+			IConnection connection,
+			HashSet<int> healthyTargets,
+			Dictionary<int, SwarmingRequestMessage[]> swarmingRequests)
 		{
+			const int maxRetries = 3;
+			var pendingRequests = swarmingRequests;
+			var failures = new List<SwarmingResult>();
+			var remainingHealthyTargets = healthyTargets.ToList();
+
+			for (int attempt = 1; attempt <= maxRetries && pendingRequests.Count > 0; attempt++)
+			{
+				if (attempt > 1)
+				{
+					engine.GenerateInformation($"NodeRecovery: Retry attempt {attempt}/{maxRetries} ({failures.Count} object(s) left) ...");
+					Thread.Sleep(TimeSpan.FromSeconds(5 * attempt));
+				}
+
+				failures = Execute(connection, pendingRequests);
+
+				if (failures.Count == 0)
+				{
+					engine.GenerateInformation("NodeRecovery: All swarming requests succeeded.");
+					return;
+				}
+				else
+				{
+					foreach (var failure in failures)
+						engine.Log($"NodeRecovery: Swarming failed for object {failure.DmaObjectRef} to target agent {failure.TargetDmaId}: {failure.Message}");
+				}
+
+				if (attempt < maxRetries)
+				{
+					engine.GenerateInformation($"NodeRecovery: {failures.Count} object(s) failed to swarm, retrying...");
+
+					// Exclude "healhty" agents that just had a swarm failures, something might be wrong
+					// However the failure might also be due to the object in question
+					// We do a heuristic here where if we see multiple failures for the same target agent,
+					// we consider that agent as unhealthy and exclude it from the retries
+					var failureCountPerAgent = failures.GroupBy(f => f.TargetDmaId).ToDictionary(g => g.Key, g => g.Count());
+					const int failureThreshold = 3;
+					remainingHealthyTargets = remainingHealthyTargets
+						.Where(t => !failureCountPerAgent.TryGetValue(t, out var count) || count < failureThreshold)
+						.ToList();
+
+					if (remainingHealthyTargets.Count == 0)
+					{
+						engine.GenerateInformation("NodeRecovery: No remaining healthy targets to retry failed swarms.");
+						return;
+					}
+
+					pendingRequests = RedistributeFailedObjects(failures, remainingHealthyTargets);
+				}
+				else
+				{
+					engine.GenerateInformation($"NodeRecovery: {failures.Count} object(s) failed to swarm.");
+				}
+			}
+		}
+
+		private static List<SwarmingResult> Execute(IConnection connection, Dictionary<int, SwarmingRequestMessage[]> swarmingRequests)
+		{
+			if (swarmingRequests.Count == 0)
+				return new List<SwarmingResult>();
+
 			// Create a nested ExecuteArrayMessage to run in parallel per agent
 			// However, per agent we then run sequentially per object type to avoid overloading the agent
 			// and prioritizing the more important object types first (services are not worth much without elements).
@@ -44,6 +111,36 @@
 				.ToList();
 
 			return failures;
+		}
+
+		private static Dictionary<int, SwarmingRequestMessage[]> RedistributeFailedObjects(
+			List<SwarmingResult> failures,
+			List<int> healhtyTargets)
+		{
+			if (failures.Count == 0)
+				return new Dictionary<int, SwarmingRequestMessage[]>();
+
+			// Simple round-robin distribution to any healthy node
+			var redistributed = new Dictionary<int, List<DMAObjectRef>>();
+			int nodeIndex = 0;
+
+			foreach (var failure in failures)
+			{
+				int targetNode = healhtyTargets[nodeIndex % healhtyTargets.Count];
+				nodeIndex++;
+
+				if (!redistributed.TryGetValue(targetNode, out var list))
+				{
+					list = new List<DMAObjectRef>();
+					redistributed[targetNode] = list;
+				}
+
+				list.Add(failure.DmaObjectRef);
+			}
+
+			return redistributed.ToDictionary(
+				kvp => kvp.Key,
+				kvp => new[] { new SwarmingRequestMessage { TargetDmaId = kvp.Key, DmaObjectRefs = kvp.Value.ToArray() } });
 		}
 	}
 }
