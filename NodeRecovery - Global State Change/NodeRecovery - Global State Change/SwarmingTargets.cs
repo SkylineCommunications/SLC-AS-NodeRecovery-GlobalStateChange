@@ -8,7 +8,16 @@
 
 	public static class SwarmingTargets
 	{
-		public static (HashSet<int> HealhtyTargets, HashSet<int> OutageSources) Calculate(
+		public static HashSet<int> CalculateoutageSources(GlobalStateChangeInput input)
+		{
+			// Gather all nodes that are in Outage (to swarm from)
+			return input.ClusterState
+				.Where(kvp => kvp.Value.State == NodeState.Outage && !kvp.Value.InMaintenance)
+				.Select(kvp => kvp.Key)
+				.ToHashSet();
+		}
+
+		public static HashSet<int> CalculateHealhtyTargets(
 			GlobalStateChangeInput input,
 			GetDataMinerInfoResponseMessage[] dataMinerInfoEvents = null,
 			IEngine engine = null)
@@ -24,17 +33,13 @@
 				engine?.Log($"NodeRecovery: Detected {disconnectedAgents.Count} disconnected agent(s) according to local SLNet: {string.Join(", ", disconnectedAgents)}. These agents will be excluded from swarming targets and sources.");
 			}
 
-			// Gather all nodes that are in Outage (to swarm from) and Healthy (to swarm to)
+			// Gather all nodes that are Healthy (to swarm to)
 			// Exclude nodes in Maintenance mode as they are not be touched in any capacity
 			// Implicitly ignores nodes in Unknown state as well
-			var nodesByState = input.ClusterState
-				.Where(kvp => !kvp.Value.InMaintenance && !disconnectedAgents.Contains(kvp.Key))
-				.ToLookup(kvp => kvp.Value.State, kvp => kvp.Key);
-
-			var healhtyTargets = new HashSet<int>(nodesByState[NodeState.Healthy]);
-			var outageSources = new HashSet<int>(nodesByState[NodeState.Outage]);
-
-			return (healhtyTargets, outageSources);
+			return input.ClusterState
+				.Where(kvp => kvp.Value.State == NodeState.Healthy && !kvp.Value.InMaintenance && !disconnectedAgents.Contains(kvp.Key))
+				.Select(kvp => kvp.Key)
+				.ToHashSet();
 		}
 	}
 }

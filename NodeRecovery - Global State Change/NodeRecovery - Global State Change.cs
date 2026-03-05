@@ -58,9 +58,15 @@ namespace NodeRecoveryGlobalStateChange
 		{
 			engine.Timeout = TimeSpan.FromMinutes(30);
 
-			var connection = engine.GetUserConnection();
+			// To avoid unneccesary data transfer from SLNet,
+			// we will first check if there are any outages that need recovery
+			var outageSources = SwarmingTargets.CalculateoutageSources(input);
 
-			// TODO first check outage to avoid unnecessary data transfer on all healthy
+			if (outageSources.Count == 0)
+			{
+				engine.GenerateInformation("NodeRecovery: No outages detected, skipping swarming.");
+				return default;
+			}
 
 			// Fetch DMS agent states
 			// Also fetch discovery messages from handlers for swarming object types
@@ -72,13 +78,14 @@ namespace NodeRecoveryGlobalStateChange
 				.Concat(new[] { new GetInfoMessage(InfoType.DataMinerInfo) })
 				.ToList();
 
+			var connection = engine.GetUserConnection();
 			var infoEvents = connection.HandleMessages(discoveryMessages.ToArray());
 
 			var dataMinerInfos = infoEvents.OfType<GetDataMinerInfoResponseMessage>().ToArray();
 
 			var swarmingObjects = SwarmingContext.ConvertInfoEvents(infoEvents);
 
-			var (healhtyTargets, outageSources) = SwarmingTargets.Calculate(input, dataMinerInfos, engine);
+			var healhtyTargets = SwarmingTargets.CalculateHealhtyTargets(input, dataMinerInfos, engine);
 
 			var swarmingRequests = SwarmingCalculator.CalculateSwarmingRequests(
 				healhtyTargets,
