@@ -1,6 +1,7 @@
 namespace NodeRecoveryGlobalStateChange
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Linq;
 	using Skyline.DataMiner.Automation;
 	using Skyline.DataMiner.Net.Messages;
@@ -57,21 +58,39 @@ namespace NodeRecoveryGlobalStateChange
 		{
 			engine.Timeout = TimeSpan.FromMinutes(30);
 
-			var connection = engine.GetUserConnection();
+			// To avoid unneccesary data transfer from SLNet,
+			// we will first check if there are any outages that need recovery
+			var outageSources = SwarmingTargets.CalculateOutageSources(input);
 
-			// Dynamically fetch discovery messages from handlers
+			if (outageSources.Count == 0)
+			{
+				engine.GenerateInformation("NodeRecovery: No outages detected, skipping swarming.");
+				return default;
+			}
+
+			// Fetch DMS agent states
+			// Also fetch discovery messages from handlers for swarming object types
 			var discoveryMessages = SwarmingContext
 				.Handlers
 				.Values
 				.Select(h => h.DiscoveryMessage)
 				.Where(m => m != null)
-				.ToArray();
+				.Concat(new[] { new GetInfoMessage(InfoType.DataMinerInfo) })
+				.ToList();
 
-			var infoEvents = connection.HandleMessages(discoveryMessages);
+			var connection = engine.GetUserConnection();
+			var infoEvents = connection.HandleMessages(discoveryMessages.ToArray());
+
+			var dataMinerInfos = infoEvents.OfType<GetDataMinerInfoResponseMessage>().ToArray();
 
 			var swarmingObjects = SwarmingContext.ConvertInfoEvents(infoEvents);
 
-			var swarmingRequests = SwarmingCalculator.CalculateSwarmingRequests(input.ClusterState, swarmingObjects);
+			var healhtyTargets = SwarmingTargets.CalculateHealthyTargets(input, dataMinerInfos, engine);
+
+			var swarmingRequests = SwarmingCalculator.CalculateSwarmingRequests(
+				healhtyTargets,
+				outageSources,
+				swarmingObjects);
 
 			if (swarmingRequests.Count == 0)
 			{
@@ -80,45 +99,9 @@ namespace NodeRecoveryGlobalStateChange
 			}
 
 			int totalObjects = swarmingRequests.Values.Sum(reqs => reqs.Sum(req => req.DmaObjectRefs.Length));
-			engine.GenerateInformation($"NodeRecovery: Swarming {totalObjects} object(s) to {swarmingRequests.Count} agents.");
+			engine.GenerateInformation($"NodeRecovery: Swarming {totalObjects} object(s)");
 
-			// Create a nested ExecuteArrayMessage to run in parallel per agent
-			// However, per agent we then run sequentially per object type to avoid overloading the agent
-			// and prioritizing the more important object types first (services are not worth much without elements).
-			var sequentialWrappersPerAgent = swarmingRequests.Values.Select(arr => new ExecuteArrayMessage(arr)).ToArray<DMSMessage>();
-			var parallelWrapper = new ExecuteArrayMessage(sequentialWrappersPerAgent, ExecuteArrayOptions.Parallel);
-
-			var parallelWrapperResponse = connection.HandleSingleResponseMessage(parallelWrapper) as ExecuteArrayResponse;
-
-			if (parallelWrapperResponse == null)
-			{
-				engine.ExitFail("NodeRecovery: Swarming execution failed, no response for swarming requests");
-				return default;
-			}
-
-			// Unwrap the parallel wrapper
-			var sequentialWrapperResponses = parallelWrapperResponse
-				.Responses
-				.SelectMany(executeResponse => executeResponse.Responses)
-				.OfType<ExecuteArrayResponse>();
-
-			// Unwrap the sequential wrappers and flatten the list of list to get single collection
-			var swarmingResponses = sequentialWrapperResponses
-				.SelectMany(executeResponse => executeResponse
-					.Responses
-					.SelectMany(sequentialWrapperResponse => sequentialWrapperResponse.Responses))
-				.OfType<SwarmingResponseMessage>();
-
-			// For each SwarmingResponseMessage, collect the failed results
-			var failures = swarmingResponses
-				.SelectMany(resp => resp.SwarmingResults)
-				.Where(res => !res.Success)
-				.ToList();
-
-			if (failures.Count == 0)
-				engine.GenerateInformation("NodeRecovery: All swarming requests succeeded.");
-			else
-				engine.GenerateInformation($"NodeRecovery: {failures.Count} object(s) failed to swarm.");
+			SwarmingExecutor.ExecuteWithRetry(engine, connection, healhtyTargets, swarmingRequests);
 
 			return default;
 		}
