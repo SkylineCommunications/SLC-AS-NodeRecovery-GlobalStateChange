@@ -60,7 +60,7 @@ namespace NodeRecoveryGlobalStateChange
 
 			// To avoid unneccesary data transfer from SLNet,
 			// we will first check if there are any outages that need recovery
-			var outageSources = SwarmingTargets.CalculateoutageSources(input);
+			var outageSources = SwarmingTargets.CalculateOutageSources(input);
 
 			if (outageSources.Count == 0)
 			{
@@ -85,7 +85,7 @@ namespace NodeRecoveryGlobalStateChange
 
 			var swarmingObjects = SwarmingContext.ConvertInfoEvents(infoEvents);
 
-			var healhtyTargets = SwarmingTargets.CalculateHealhtyTargets(input, dataMinerInfos, engine);
+			var healhtyTargets = SwarmingTargets.CalculateHealthyTargets(input, dataMinerInfos, engine);
 
 			var swarmingRequests = SwarmingCalculator.CalculateSwarmingRequests(
 				healhtyTargets,

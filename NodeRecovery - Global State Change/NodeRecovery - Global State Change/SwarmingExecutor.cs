@@ -73,7 +73,7 @@
 						return;
 					}
 
-					pendingRequests = RedistributeFailedObjects(failures, remainingHealthyTargets);
+					pendingRequests = RedistributeFailedObjects(failures, remainingHealthyTargets, attempt);
 				}
 				else
 				{
@@ -124,7 +124,8 @@
 
 		private static Dictionary<int, SwarmingRequestMessage[]> RedistributeFailedObjects(
 			List<SwarmingResult> failures,
-			List<int> healthyTargets)
+			List<int> healthyTargets,
+			int attempt)
 		{
 			if (failures.Count == 0)
 				return new Dictionary<int, SwarmingRequestMessage[]>();
@@ -132,7 +133,10 @@
 			// Simple round-robin distribution to any healthy node
 			// but avoid assigning an object to the same agent it just failed on
 			var redistributed = new Dictionary<int, List<DMAObjectRef>>();
-			int nodeIndex = 0;
+
+			// To avoid every attempt swarming the same object to the same target
+			// (in case of repeated failures), we start the round-robin from a different index each time
+			int nodeIndex = attempt;
 
 			foreach (var failure in failures)
 			{

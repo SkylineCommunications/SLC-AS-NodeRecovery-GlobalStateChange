@@ -8,7 +8,7 @@
 
 	public static class SwarmingTargets
 	{
-		public static HashSet<int> CalculateoutageSources(GlobalStateChangeInput input)
+		public static HashSet<int> CalculateOutageSources(GlobalStateChangeInput input)
 		{
 			// Gather all nodes that are in Outage (to swarm from)
 			return input.ClusterState
@@ -17,7 +17,7 @@
 				.ToHashSet();
 		}
 
-		public static HashSet<int> CalculateHealhtyTargets(
+		public static HashSet<int> CalculateHealthyTargets(
 			GlobalStateChangeInput input,
 			GetDataMinerInfoResponseMessage[] dataMinerInfoEvents = null,
 			IEngine engine = null)
@@ -30,7 +30,7 @@
 
 			if (disconnectedAgents.Count > 0)
 			{
-				engine?.Log($"NodeRecovery: Detected {disconnectedAgents.Count} disconnected agent(s) according to local SLNet: {string.Join(", ", disconnectedAgents)}. These agents will be excluded from swarming targets and sources.");
+				engine?.Log($"NodeRecovery: Detected {disconnectedAgents.Count} disconnected/unavailable agent(s) according to local SLNet: {string.Join(", ", disconnectedAgents)}. These agents will be excluded from swarming targets.");
 			}
 
 			// Gather all nodes that are Healthy (to swarm to)
