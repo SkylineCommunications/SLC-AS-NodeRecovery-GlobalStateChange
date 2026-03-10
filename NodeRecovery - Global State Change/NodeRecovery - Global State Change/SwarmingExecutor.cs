@@ -169,7 +169,10 @@
 
 			return redistributed.ToDictionary(
 				kvp => kvp.Key,
-				kvp => new[] { new SwarmingRequestMessage { TargetDmaId = kvp.Key, DmaObjectRefs = kvp.Value.ToArray() } });
+				kvp => kvp.Value
+						.GroupBy(dmaObjectRef => dmaObjectRef.GetType().Name) // can only swarm same object types together
+						.Select(grp => new SwarmingRequestMessage { TargetDmaId = kvp.Key, DmaObjectRefs = grp.ToArray() })
+						.ToArray());
 		}
 	}
 }
