@@ -85,10 +85,10 @@ namespace NodeRecoveryGlobalStateChange
 
 			var swarmingObjects = SwarmingContext.ConvertInfoEvents(infoEvents);
 
-			var healhtyTargets = SwarmingTargets.CalculateHealthyTargets(input, dataMinerInfos, engine);
+			var healthyTargets = SwarmingTargets.CalculateHealthyTargets(input, dataMinerInfos, engine);
 
 			var swarmingRequests = SwarmingCalculator.CalculateSwarmingRequests(
-				healhtyTargets,
+				healthyTargets,
 				outageSources,
 				swarmingObjects);
 
@@ -101,7 +101,7 @@ namespace NodeRecoveryGlobalStateChange
 			int totalObjects = swarmingRequests.Values.Sum(reqs => reqs.Sum(req => req.DmaObjectRefs.Length));
 			engine.GenerateInformation($"NodeRecovery: Swarming {totalObjects} object(s)");
 
-			SwarmingExecutor.ExecuteWithRetry(engine, connection, healhtyTargets, swarmingRequests);
+			SwarmingExecutor.ExecuteWithRetry(engine, connection, healthyTargets, swarmingRequests);
 
 			return default;
 		}

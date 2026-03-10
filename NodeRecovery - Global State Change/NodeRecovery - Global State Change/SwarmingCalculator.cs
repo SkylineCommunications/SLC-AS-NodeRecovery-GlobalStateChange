@@ -14,23 +14,23 @@ namespace NodeRecoveryGlobalStateChange
 		/// <summary>
 		/// Calculates the swarming requests needed to move objects from unhealthy nodes to healthy nodes.
 		/// </summary>
-		/// <param name="healhtyTargets">DMAID of agents that are valid swarming targets.</param>
+		/// <param name="healthyTargets">DMAID of agents that are valid swarming targets.</param>
 		/// <param name="outageSources">DMAID of agents in node recovery global outage that needs recovery.</param>
 		/// <param name="allObjects">All swarming objects in the cluster.</param>
 		/// <returns>Dictionary of Swarming request arrays, 1 array per target agent id. Each array contains a message per SwarmingObjectType.</returns>
 		public static Dictionary<int, SwarmingRequestMessage[]> CalculateSwarmingRequests(
-			HashSet<int> healhtyTargets,
+			HashSet<int> healthyTargets,
 			HashSet<int> outageSources,
 			List<SwarmingObject> allObjects)
 		{
-			if (healhtyTargets == null)
-				throw new ArgumentNullException(nameof(healhtyTargets));
+			if (healthyTargets == null)
+				throw new ArgumentNullException(nameof(healthyTargets));
 			if (outageSources == null)
 				throw new ArgumentNullException(nameof(outageSources));
 			if (allObjects == null)
 				throw new ArgumentNullException(nameof(allObjects));
 
-			if (healhtyTargets.Count == 0 || outageSources.Count == 0)
+			if (healthyTargets.Count == 0 || outageSources.Count == 0)
 				return new Dictionary<int, SwarmingRequestMessage[]>();
 
 			var objectsToMove = allObjects
@@ -40,8 +40,8 @@ namespace NodeRecoveryGlobalStateChange
 			if (objectsToMove.Count == 0)
 				return new Dictionary<int, SwarmingRequestMessage[]>();
 
-			var nodeLoadTracker = new NodeLoadTracker(healhtyTargets, allObjects);
-			var assignments = new Dictionary<int, List<SwarmingObject>>(healhtyTargets.Count);
+			var nodeLoadTracker = new NodeLoadTracker(healthyTargets, allObjects);
+			var assignments = new Dictionary<int, List<SwarmingObject>>(healthyTargets.Count);
 
 			// To maximize balancing effectiveness, assign heaviest objects first
 			// This avoids a scenario where many small objects are assigned first,

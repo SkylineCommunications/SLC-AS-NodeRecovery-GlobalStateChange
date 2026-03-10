@@ -48,7 +48,7 @@
 				{
 					engine.GenerateInformation($"NodeRecovery: {failures.Count} object(s) failed to swarm, retrying...");
 
-					// Exclude "healhty" agents that just had a swarm failures, something might be wrong
+					// Exclude "healthy" agents that just had a swarm failures, something might be wrong
 					// However the failure might also be due to the object in question
 					// We do a heuristic here where if we see multiple failures for the same target agent,
 					// we consider that agent as unhealthy and exclude it from the retries
