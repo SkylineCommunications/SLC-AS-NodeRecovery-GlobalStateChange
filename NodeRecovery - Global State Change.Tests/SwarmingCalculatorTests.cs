@@ -11,6 +11,17 @@ namespace NodeRecoveryGlobalStateChange.Tests
 	public class SwarmingCalculatorTests
 	{
 		[Test]
+		public void HealthyTargetAndOutageSourceOverlaps_Throws()
+		{
+			Assert.That(
+				() => SwarmingCalculator.CalculateSwarmingRequests(
+					new HashSet<int> { 1, 2, 3 },
+					new HashSet<int> { 3, 4, 5 },
+					new List<SwarmingObject>()),
+				Throws.ArgumentException.With.Message.Contains("overlap"));
+		}
+
+		[Test]
 		public void NoHealthyNodes_ReturnsEmpty()
 		{
 			// Arrange

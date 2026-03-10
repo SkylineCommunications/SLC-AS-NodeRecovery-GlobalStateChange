@@ -33,6 +33,10 @@ namespace NodeRecoveryGlobalStateChange
 			if (healthyTargets.Count == 0 || outageSources.Count == 0)
 				return new Dictionary<int, SwarmingRequestMessage[]>();
 
+			// Sanity check, should never occur
+			if (healthyTargets.Overlaps(outageSources))
+				throw new ArgumentException("Healthy targets and outage sources cannot overlap.");
+
 			var objectsToMove = allObjects
 				.Where(o => o.IsSwarmable && outageSources.Contains(o.HostingAgentId))
 				.ToList();
