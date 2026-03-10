@@ -225,7 +225,7 @@ namespace NodeRecoveryGlobalStateChange.Tests
 			Assert.That(result.ContainsKey(2), Is.True); // Should only have requests for node 2
 			var swarmingRequests = result[2];
 			Assert.That(swarmingRequests, Has.Length.EqualTo(1));
-			Assert.That(swarmingRequests[0].DmaObjectRefs, Has.Length.EqualTo(2)); // Only object from node 1 should be moved
+			Assert.That(swarmingRequests[0].DmaObjectRefs, Has.Length.EqualTo(2)); // All elements should move to node 2 as node 3 is disconnected
 		}
 
 		[Test]

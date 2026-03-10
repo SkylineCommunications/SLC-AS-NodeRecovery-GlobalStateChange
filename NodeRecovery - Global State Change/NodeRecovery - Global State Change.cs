@@ -1,12 +1,10 @@
 namespace NodeRecoveryGlobalStateChange
 {
 	using System;
-	using System.Collections.Generic;
 	using System.Linq;
 	using Skyline.DataMiner.Automation;
 	using Skyline.DataMiner.Net.Messages;
 	using Skyline.DataMiner.Net.NodeRecovery;
-	using Skyline.DataMiner.Net.Swarming;
 
 	/// <summary>
 	/// Script that is triggered by NodeRecovery on global state changes.
@@ -58,7 +56,7 @@ namespace NodeRecoveryGlobalStateChange
 		{
 			engine.Timeout = TimeSpan.FromMinutes(30);
 
-			// To avoid unneccesary data transfer from SLNet,
+			// To avoid unnecessary data transfer from SLNet,
 			// we will first check if there are any outages that need recovery
 			var outageSources = SwarmingTargets.CalculateOutageSources(input);
 

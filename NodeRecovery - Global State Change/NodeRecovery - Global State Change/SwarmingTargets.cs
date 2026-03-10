@@ -8,6 +8,12 @@
 
 	public static class SwarmingTargets
 	{
+		/// <summary>
+		/// From the <see cref="GlobalStateChangeInput"/> find the node ids of nodes that are considered in trouble
+		/// and thus need their objects to be swarmed away.
+		/// </summary>
+		/// <param name="input">Input from NodeRecovery.</param>
+		/// <returns>set of node ids.</returns>
 		public static HashSet<int> CalculateOutageSources(GlobalStateChangeInput input)
 		{
 			// Gather all nodes that are in Outage (to swarm from)
@@ -17,6 +23,14 @@
 				.ToHashSet();
 		}
 
+		/// <summary>
+		/// From the <see cref="GlobalStateChangeInput"/> and SLNet agent info objects, find the node ids of nodes that are considered
+		/// healthy and thus can be used to swarm to.
+		/// </summary>
+		/// <param name="input">Input from NodeRecovery.</param>
+		/// <param name="dataMinerInfoEvents">Agent info from local SLNet.</param>
+		/// <param name="engine">Automation's engine object</param>
+		/// <returns>set of node ids.</returns>
 		public static HashSet<int> CalculateHealthyTargets(
 			GlobalStateChangeInput input,
 			GetDataMinerInfoResponseMessage[] dataMinerInfoEvents = null,
