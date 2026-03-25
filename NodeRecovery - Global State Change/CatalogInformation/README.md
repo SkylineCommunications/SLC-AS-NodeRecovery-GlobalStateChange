@@ -22,6 +22,6 @@ Swarming operations happen in parallel per agent, where the swarming per agent h
 
 ## Prerequisites
 
-- DataMiner version 10.6.3 or higher
+- DataMiner version 10.6.3/10.6.0 or newer
 - Swarming must be enabled
 - DataMiner NodeRecovery DxM module installed
